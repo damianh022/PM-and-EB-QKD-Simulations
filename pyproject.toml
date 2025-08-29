@@ -1,0 +1,25 @@
+# filepath: /home/damia/PM-and-EB-QKD-Simulations/pyproject.toml
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+extend-exclude = [
+  "PM QKD Results",
+  "EB QKD Results",
+  ".venv",
+  "__pycache__",
+  "build",
+  "dist",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "D", "UP", "B", "N", "PLC", "PLE", "PLR", "PLW"]
+ignore = [
+  "D203",
+  "D213",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.format]
+quote-style = "preserve"

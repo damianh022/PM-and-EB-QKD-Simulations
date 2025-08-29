@@ -6,6 +6,14 @@ Simulation code for Quantum Key Distribution experiments used in this dissertati
 - E91 (Entanglement Based)
 
 
+This workspace contains:
+
+- Prepare and Measure simulations, topology sweeps and visualisation in [Prepare and Measure Simulations](Prepare and Measure Simulations)
+
+- Entanglement Based E91 experiments and plots in [Entanglement Based Simulations](Entanglement Based Simulations)
+
+- Figures and Results are saved in [PM QKD Results](Prepare and Measure Simulations/PM QKD Results) and [EB QKD Results](EB QKD Results)
+
 ## Dependencies
 
 - Python 3.10+

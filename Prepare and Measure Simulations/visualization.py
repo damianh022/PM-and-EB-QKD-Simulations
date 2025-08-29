@@ -186,7 +186,7 @@ def create_total_distance_plots(all_results, topologies, output_dir, node_pairs,
                     label=f'{topology.capitalize()} ({hops} hops)')
     
     plt.xlabel('Total End-to-End Distance (km)', fontsize=14)
-    plt.ylabel('Key Exchange Rate (bits/second)', fontsize=14)
+    plt.ylabel('Key Exchange Rate (bits/unit time)', fontsize=14)
     plt.title('Key Rate vs Total Distance', fontsize=28, fontweight='bold')
     plt.xlim(0, max_distance)  
     plt.grid(True)

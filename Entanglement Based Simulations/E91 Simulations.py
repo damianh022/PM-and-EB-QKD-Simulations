@@ -1270,8 +1270,8 @@ def run_p2p_simulation(channel_length_km, detector_efficiency, loss_per_km, simu
     }
 
 def run_p2p_distance_sweep():
-    """Run P2P simulations at different distances."""
-    distances = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 110, 120, 130, 150]
+    distances = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100,
+                 110, 120, 130, 140, 150, 160, 170, 180, 190, 200]
     detector_efficiency = 0.9
     loss_per_km = 0.2
     simulation_duration = 500
@@ -1291,32 +1291,27 @@ def run_p2p_distance_sweep():
     return results
 
 def create_p2p_plot(results):
-    """Create a P2P key rate vs. distance plot similar to relay protocol."""
-    plt.figure(figsize=(7, 5))  # match PM baseline size
-
+    plt.figure(figsize=(7, 5))
     distances = [r["channel_length"] for r in results]
     key_rates = [r["key_rate"] for r in results]
     qbers = [r["qber"] for r in results]
 
-    # Key rate vs distance 
     plt.plot(distances, key_rates, marker='X', linestyle='-',
              linewidth=1.5, markersize=6, color='#d62728')
     plt.xlabel('Total End-to-End Distance (km)', fontsize=13)
-    plt.ylabel('Key Exchange Rate (bits/second)', fontsize=13)
-    plt.title('Point-to-Point Key Exchange Rate vs. Distance\n(No Relay Nodes)', fontsize=16, fontweight='bold')
+    plt.ylabel('Key Exchange Rate (bits/unit time)', fontsize=13)
+    plt.title('Point-to-Point Key Exchange Rate vs. Distance\n(EPS in Middle)', fontsize=16, fontweight='bold')
     plt.grid(True)
     plt.xlim(10, 200)
+    plt.ylim(0, 0.5)
     plt.xticks(np.arange(10, 201, 10), fontsize=9)
     plt.yticks(fontsize=9)
-    y_max = max(key_rates) if key_rates else 0
-    plt.ylim(0, upper_limit(y_max))
     plt.tight_layout()
     output_path = os.path.join(OUTPUT_DIR, "p2p_key_rate_vs_distance.png")
     plt.savefig(output_path, dpi=300)
     plt.close()
 
-    
-    plt.figure(figsize=(7, 5))  
+    plt.figure(figsize=(7, 5))
     plt.plot(distances, qbers, marker='X', linestyle='-',
              linewidth=1.5, markersize=6, color='#d62728')
     plt.xlabel('Total End-to-End Distance (km)', fontsize=13)
@@ -1481,23 +1476,16 @@ def run_distance_sweep(num_nodes, distances, detector_efficiency, loss_per_km, t
     return results
 
 def create_topology_comparison_plots(all_results, distances, topologies):
-    """Create comparison plots between different topologies."""
-    # Create directory for comparison plots
     comparison_dir = os.path.join(OUTPUT_DIR, "topology_comparison")
     os.makedirs(comparison_dir, exist_ok=True)
 
-    # Key rate comparison
     plt.figure(figsize=(12, 8))
-
-    # Define colors for each topology
     topology_colors = {
-        'fully_connected': '#1f77b4',  # Blue
-        'star': '#ff7f0e',             # Orange
-        'ring': '#2ca02c',             # Green
-        'bus': '#d62728'               # Red
+        'fully_connected': '#1f77b4',
+        'star': '#ff7f0e',
+        'ring': '#2ca02c',
+        'bus': '#d62728'
     }
-
-    # Plot key rate for each topology
     for topology in topologies:
         rates = []
         actual_distances = []
@@ -1515,7 +1503,7 @@ def create_topology_comparison_plots(all_results, distances, topologies):
                  label=f'{topology.capitalize()} (Photon travel: {actual_distances[0]}km)')
 
     plt.xlabel('End-to-End Distance (km)', fontsize=14)
-    plt.ylabel('Average Key Rate (bits/time unit)', fontsize=14)
+    plt.ylabel('Average Key Rate (bits/unit time)', fontsize=14)
     plt.title('Key Rate Comparison - Distributed Source Model\nPhotons travel only half the total distance', fontsize=16, fontweight='bold')
     plt.grid(True)
     plt.legend()
@@ -1525,10 +1513,7 @@ def create_topology_comparison_plots(all_results, distances, topologies):
     plt.savefig(output_path, dpi=300)
     plt.close()
 
-    # QBER comparison
     plt.figure(figsize=(12, 8))
-
-    # Plot QBER for each topology
     for topology in topologies:
         qbers = []
         for distance in distances:

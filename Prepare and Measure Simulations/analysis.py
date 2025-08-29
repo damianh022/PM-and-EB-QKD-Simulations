@@ -36,7 +36,7 @@ def create_baseline_plots(distances_list, baseline_rates, baseline_qbers, output
     plt.plot(distances_list, rates_list, marker=hop_markers['baseline'], linestyle='-',
              linewidth=1.5, markersize=6, color=topology_colors['baseline'])
     plt.xlabel('Total End-to-End Distance (km)', fontsize=13)
-    plt.ylabel('Key Exchange Rate (bits/second)', fontsize=13)
+    plt.ylabel('Key Exchange Rate (bits/unit time)', fontsize=13)
     plt.title('Point-to-Point Key Exchange Rate vs. Distance\n(No Relay Nodes)', fontsize=16, fontweight='bold')
     plt.grid(True)
     plt.xlim(10, 200)
@@ -76,7 +76,7 @@ def create_baseline_plots(distances_list, baseline_rates, baseline_qbers, output
     plt.plot(distances_list, rates_list, marker=hop_markers['baseline'], linestyle='-',
              linewidth=1.5, markersize=6, color=topology_colors['baseline'])
     plt.xlabel('Total End-to-End Distance (km)', fontsize=13)
-    plt.ylabel('Key Exchange Rate (bits/second)', fontsize=13)
+    plt.ylabel('Key Exchange Rate (bits/unit time)', fontsize=13)
     plt.title('Point-to-Point Key Exchange Rate vs. Distance (Log Scale)\n(No Relay Nodes)', fontsize=16, fontweight='bold')
     plt.grid(True, which='both', axis='y')
     plt.xlim(10, 200)
@@ -109,7 +109,7 @@ def create_distance_comparison_plots(channel_length_km, topology_rates, topology
         plt.bar(x + (i-1)*bar_width + bar_width/2, rates, width=bar_width,
                 label=f"{topology.capitalize()}", color=topology_colors[topology])
     plt.xlabel('Connection Type', fontsize=10)
-    plt.ylabel('Key Exchange Rate (bits/second)', fontsize=10)
+    plt.ylabel('Key Exchange Rate (bits/unit time)', fontsize=10)
     plt.title(f'Key Exchange Rate Comparison (Including Baseline)\nChannel Length: {channel_length_km} km', fontsize=13)
     most_detailed_topology = max(topology_distances.items(), key=lambda x: len(x[1]))[0]
     plt.xticks(np.arange(len(topology_distances[most_detailed_topology])),
@@ -190,7 +190,7 @@ def create_adjacent_nodes_comparison(all_results, topologies, channel_distances,
                  color=topology_colors[topology])
 
     plt.xlabel('Total End-to-End Distance (km)', fontsize=11)
-    plt.ylabel('Key Exchange Rate (bits/second)', fontsize=11)
+    plt.ylabel('Key Exchange Rate (bits/unit time)', fontsize=11)
     plt.title('Key Rate vs. Total Distance\nAdjacent Nodes Comparison', fontsize=13)
     plt.xlim(0, 150)
     plt.legend(fontsize=10)
@@ -251,7 +251,7 @@ def create_topology_vs_baseline_plots(all_results, topology, channel_distances,
                      color=hop_color)
 
     plt.xlabel('Total End-to-End Distance (km)', fontsize=11)
-    plt.ylabel('Key Exchange Rate (bits/second)', fontsize=11)
+    plt.ylabel('Key Exchange Rate (bits/unit time)', fontsize=11)
     plt.title(f'{topology.capitalize()} Topology Key Rate vs Total Distance', fontsize=13)
     plt.xlim(0, max_distance)
     plt.legend(fontsize=10)
@@ -294,7 +294,7 @@ def visualize_hop_performance(hop_statistics, output_dir, topology_colors):
                     label=label if i == 0 else "")
 
     plt.xlabel('Total End-to-End Distance (km)', fontsize=11)
-    plt.ylabel('Key Exchange Rate (bits/second)', fontsize=11)
+    plt.ylabel('Key Exchange Rate (bits/unit time)', fontsize=11)
     plt.title('Trusted Node Advantage in Key Exchange Rate vs Distance', fontsize=13)
     plt.grid(True, axis='y')
     plt.xticks(x_positions, x_labels)

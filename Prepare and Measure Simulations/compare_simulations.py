@@ -81,7 +81,7 @@ def create_comparison_plots(results, distances, output_dir):
              linewidth=2.5, markersize=10, color='blue',
              label='Single-Photon Source')
     plt.xlabel('Distance (km)', fontsize=14)
-    plt.ylabel('Key Exchange Rate (bits/second)', fontsize=14)
+    plt.ylabel('Key Exchange Rate (bits/unit time)', fontsize=14)
     plt.title('Single-Photon Key Rate vs Distance', fontsize=16)
     plt.grid(True)
     plt.legend()

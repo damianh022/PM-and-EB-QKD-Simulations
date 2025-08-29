@@ -31,7 +31,7 @@ Python packages used for simulations and analysis:
 ## How to run
 
 - Create a virtual environment and install the dependencies:
-    - To install NetSquid, follow the installation instructions found on the [NetSquid website]([NetSquid](https://netsquid.org/))
+    - To install NetSquid, follow the installation instructions found on the [NetSquid website](https://netsquid.org/)
     - Output: figures in Prepare and Measure Simulations/PM QKD Results
 
 - Prepare and Measure (BB84):

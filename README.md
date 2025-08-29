@@ -27,3 +27,15 @@ Python packages used for simulations and analysis:
 - pandas
 - matplotlib
 - networkx
+
+## How to run
+
+- Create a virtual environment and install the dependencies:
+    - To install NetSquid, follow the installation instructions found on the [NetSquid website]([NetSquid](https://netsquid.org/))
+    - Output: figures in Prepare and Measure Simulations/PM QKD Results
+
+- Prepare and Measure (BB84):
+    - python "Prepare and Measure Simulations/main.py"
+    - python "Entanglement Based Simulations/E91 Simulations.py"
+    - Output: figures in EB QKD Results
+

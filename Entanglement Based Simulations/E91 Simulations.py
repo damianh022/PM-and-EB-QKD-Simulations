@@ -1540,7 +1540,7 @@ def create_topology_comparison_plots(all_results, distances, topologies):
 
 def run_multi_hop_simulation(topology, num_nodes, total_distance, num_hops,
                              detector_efficiency=0.9, loss_per_km=0.2, swap_success_prob=1.0,
-                             simulation_duration=500, pair_generation_rate=5.0, seed=None, target_bits=256):
+                             simulation_duration=500, pair_generation_rate=1.0, seed=None, target_bits=256):
     logging.info(f"Starting multi-hop simulation: {topology} topology, {total_distance}km, {num_hops} hops")
     ns.sim_reset()
     if seed is not None:
@@ -1682,7 +1682,7 @@ def run_multi_hop_simulation(topology, num_nodes, total_distance, num_hops,
 
 def run_multi_hop_distance_sweep(topology, num_nodes, distances, num_hops_list,
                                  detector_efficiency=0.9, loss_per_km=0.2,
-                                 swap_success_prob=1.0, simulation_duration=500, pair_generation_rate=5.0,
+                                 swap_success_prob=1.0, simulation_duration=500, pair_generation_rate=1.0,
                                  num_trials=2, target_bits=256):
     results = {h: {} for h in num_hops_list}
     for distance in distances:
@@ -1728,7 +1728,7 @@ def plot_multi_hop_comparison(results_by_topology, distances, num_hops_list, out
                 d_with = sorted([d for d in distances if d in res[h]])
                 rates = [res[h][d].get("end_to_end_key_rate", 0.0) for d in d_with]
                 plt.plot(d_with, rates, marker=topology_markers.get(topology, 'o'), linestyle='-',
-                         linewidth=1.5, markersize=6, color=hop_colors.get(h, 'black'),
+                         linewidth=2.5, markersize=10, color=hop_colors.get(h, 'black'),
                          label=f'{h} hop{"s" if h != 1 else ""}')
         plt.xlabel('Total End-to-End Distance (km)', fontsize=11)
         plt.ylabel('Key Exchange Rate (bits/time unit)', fontsize=11)
@@ -1752,7 +1752,7 @@ def plot_multi_hop_comparison(results_by_topology, distances, num_hops_list, out
                         best_rate = r
             best.append(best_rate)
         plt.plot(sorted(distances), best, marker=topology_markers.get(topology, 'o'), linestyle='-',
-                 linewidth=1.5, markersize=6, label=topology.capitalize())
+                 linewidth=2.5, markersize=10, label=topology.capitalize())
     plt.xlabel('Total End-to-End Distance (km)', fontsize=11)
     plt.ylabel('Best Key Exchange Rate (bits/time unit)', fontsize=11)
     plt.title('Best Key Exchange Rate vs Distance (Optimal Hops)', fontsize=16, fontweight='bold')
@@ -1794,7 +1794,7 @@ def run_multi_hop_analysis():
     detector_efficiency = 0.9
     loss_per_km = 0.2
     simulation_duration = 1200
-    distances = list(range(50, 1001, 50))  # 50 km steps from 50 to 1000 km
+    distances = [10, 20, 30, 40] + list(range(50, 1001, 50))  # include short distances
     topologies = ["star", "ring", "bus"]
     hops_by_topology = {
         "star": [0, 1],         # center-leaf and leaf-leaf via center
@@ -1815,7 +1815,7 @@ def run_multi_hop_analysis():
             loss_per_km=loss_per_km,
             swap_success_prob=1.0,
             simulation_duration=simulation_duration,
-            pair_generation_rate=10.0,
+            pair_generation_rate=1.0,
             num_trials=2,
             target_bits=256
         )

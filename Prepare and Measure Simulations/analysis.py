@@ -356,8 +356,9 @@ def create_topology_vs_baseline_plots(all_results,
     plt.xlabel('Total End-to-End Distance (km)', fontsize=11)
     plt.ylabel('Key Exchange Rate (bits/unit time)', fontsize=11)
     plt.title(f'{topology.capitalize()} Topology Key Rate vs Total Distance',
-              fontsize=13)
+              fontsize=16, fontweight='bold')
     plt.xlim(0, max_distance)
+    plt.ylim(0, 0.45)
     plt.legend(fontsize=10)
     plt.grid(True)
     plt.tight_layout()
@@ -411,7 +412,7 @@ def visualize_hop_performance(hop_statistics, output_dir, topology_colors):
     plt.xlabel('Total End-to-End Distance (km)', fontsize=11)
     plt.ylabel('Key Exchange Rate (bits/unit time)', fontsize=11)
     plt.title('Trusted Node Advantage in Key Exchange Rate vs Distance',
-              fontsize=13)
+              fontsize=16)
     plt.grid(True, axis='y')
     plt.xticks(x_positions, x_labels)
     plt.yscale('log')

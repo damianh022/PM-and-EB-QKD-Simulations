@@ -98,7 +98,7 @@ def visualize_network(network, topology="fully_connected", output_dir=None):
                label='Classical Channel')
     ]
     plt.legend(handles=legend_elements, loc='upper right', fontsize=20)
-    plt.title(f"QKD Network Visualisation ({topology} topology)",
+    plt.title(f"PM QKD Network ({topology} topology)",
               fontsize=28,
               fontweight='bold')
     plt.axis('off')

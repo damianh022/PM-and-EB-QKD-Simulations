@@ -1173,7 +1173,7 @@ def visualize_network(network, topology="fully_connected"):
                loc='upper right',
                bbox_to_anchor=(0.98, 0.98),
                fontsize=16)
-    plt.title(f"Distributed Source EB-QKD Network ({topology} topology)",
+    plt.title(f"EB-QKD Network ({topology} topology)",
               fontsize=22,
               fontweight='bold')
     plt.axis('off')
@@ -1251,7 +1251,7 @@ def visualize_p2p_network(network):
                marker='o',
                color='w',
                markerfacecolor='skyblue',
-               markersize=15,
+               markersize=12,
                label='QKD Node'),
         Line2D([0], [0],
                marker='o',
@@ -1286,7 +1286,7 @@ def visualize_p2p_network(network):
 
 def visualize_star_central_source_quantum_only(num_leaves=5):
     """Visualise a star where the central node is a source and leaves connect via quantum channels only."""
-    network = Network("EB-QKD Star (Central Source, Quantum-Only)")
+    network = Network("EB-QKD Star (Central Source)")
     source = Node("Source_Center")
     leaves = [Node(f"Node_{i}") for i in range(1, num_leaves + 1)]
     network.add_nodes([source] + leaves)
@@ -1355,7 +1355,12 @@ def visualize_star_central_source_quantum_only(num_leaves=5):
     node_colors = [G.nodes[node].get('color', 'skyblue') for node in G.nodes()]
     node_sizes = [G.nodes[node].get('size', 3000) for node in G.nodes()]
     nx.draw_networkx_nodes(G, pos, node_size=node_sizes, node_color=node_colors)
-    nx.draw_networkx_labels(G, pos, font_size=14, font_weight='bold')
+
+    # Create label maps so that the central source node shows "Central EPS"
+    regular_labels = {node: node for node in G.nodes() if "Source" not in node}
+    source_labels = {node: "Central EPS" for node in G.nodes() if "Source" in node}
+    labels = {**regular_labels, **source_labels}
+    nx.draw_networkx_labels(G, pos, labels=labels, font_size=14, font_weight='bold')
 
     for u, v, key, data in G.edges(keys=True, data=True):
         style = data.get('style', 'solid')
@@ -1389,7 +1394,7 @@ def visualize_star_central_source_quantum_only(num_leaves=5):
                bbox_to_anchor=(0.98, 0.98),
                fontsize=16,
                frameon=True)
-    plt.title("EB-QKD Star Visualisation (Central Source, Quantum-Only Links)",
+    plt.title("EB-QKD Star Network (Central Source)",
               fontsize=22,
               fontweight='bold')
     plt.axis('off')
@@ -1495,7 +1500,7 @@ def run_p2p_simulation(channel_length_km, detector_efficiency, loss_per_km,
     num_chunks = simulation_duration // chunk_size
     for i in range(num_chunks):
         ns.sim_run(duration=chunk_size)
-        if shared_keys and i % 10 == 0:  # Log less frequently
+        if shared_keys and i % 10 == 0: # Log less frequently
             logging.info(
                 f"Simulation progress: {(i+1)*chunk_size}/{simulation_duration}, Keys: {len(shared_keys)}"
             )
@@ -1537,10 +1542,7 @@ def run_p2p_simulation(channel_length_km, detector_efficiency, loss_per_km,
 
 
 def run_p2p_distance_sweep():
-    distances = [
-        5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90,
-        95, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200
-    ]
+    distances = list(range(5, 101, 5)) + list(range(110, 201, 10)) + list(range(250, 1001, 50))
     detector_efficiency = 0.9
     loss_per_km = 0.2
     simulation_duration = 500
@@ -1557,56 +1559,73 @@ def run_p2p_distance_sweep():
 
 
 def create_p2p_plot(results):
-    plt.figure(figsize=(7, 5))
     distances = [r["channel_length"] for r in results]
     key_rates = [r["key_rate"] for r in results]
     qbers = [r["qber"] for r in results]
 
-    plt.plot(distances,
-             key_rates,
-             marker='X',
-             linestyle='-',
-             linewidth=1.5,
-             markersize=6,
-             color='#d62728')
-    plt.xlabel('Total End-to-End Distance (km)', fontsize=13)
-    plt.ylabel('Key Exchange Rate (bits/unit time)', fontsize=13)
-    plt.title('Point-to-Point Key Exchange Rate vs. Distance\n(EPS in Middle)',
-              fontsize=16,
-              fontweight='bold')
-    plt.grid(True)
-    plt.xlim(10, 200)
-    plt.ylim(0, 0.5)
-    plt.xticks(np.arange(10, 201, 10), fontsize=9)
-    plt.yticks(fontsize=9)
-    plt.tight_layout()
-    output_path = os.path.join(OUTPUT_DIR, "p2p_key_rate_vs_distance.png")
-    plt.savefig(output_path, dpi=300)
-    plt.close()
+    # Generate multiple key rate plots with x-axis max from 100 to 1000 km
+    x_max_values = list(range(100, 1001, 100))
+    for x_max in x_max_values:
+        plt.figure(figsize=(7, 5))
+        plt.plot(distances,
+                 key_rates,
+                 marker='X',
+                 linestyle='-',
+                 linewidth=1.5,
+                 markersize=6,
+                 color='#d62728')
+        plt.xlabel('Total End-to-End Distance (km)', fontsize=13)
+        plt.ylabel('Key Exchange Rate (bits/unit time)', fontsize=13)
+        plt.title(f'EB-QKD P2P Key Exchange Rate vs. Distance\n(Entanglement Source in Middle, 0–{x_max} km)',
+                  fontsize=16,
+                  fontweight='bold')
+        plt.grid(True)
+        plt.xlim(0, x_max)
+        plt.ylim(0, 0.45)
+        # x-ticks: scale spacing based on range
+        if x_max <= 200:
+            plt.xticks(np.arange(0, x_max + 1, 10), fontsize=9)
+        elif x_max <= 500:
+            plt.xticks(np.arange(0, x_max + 1, 50), fontsize=9)
+        else:
+            plt.xticks(np.arange(0, x_max + 1, 100), fontsize=9)
+        plt.yticks(np.arange(0, 0.451, 0.05), fontsize=9)
+        plt.tight_layout()
+        output_path = os.path.join(OUTPUT_DIR, f"p2p_key_rate_vs_distance_{x_max}km.png")
+        plt.savefig(output_path, dpi=300)
+        plt.close()
 
-    plt.figure(figsize=(7, 5))
-    plt.plot(distances,
-             qbers,
-             marker='X',
-             linestyle='-',
-             linewidth=1.5,
-             markersize=6,
-             color='#d62728')
-    plt.xlabel('Total End-to-End Distance (km)', fontsize=13)
-    plt.ylabel('Quantum Bit Error Rate (QBER)', fontsize=13)
-    plt.title('Point-to-Point QBER vs. Distance\n(No Relay Nodes)',
-              fontsize=16,
-              fontweight='bold')
-    plt.grid(True)
-    plt.xlim(10, 200)
-    plt.xticks(np.arange(10, 201, 10), fontsize=9)
-    plt.yticks(fontsize=9)
+    # Generate multiple QBER plots with x-axis max from 100 to 1000 km
     y_max_qber = max(qbers) if qbers else 0
-    plt.ylim(0, upper_limit(y_max_qber))
-    plt.tight_layout()
-    output_path = os.path.join(OUTPUT_DIR, "p2p_qber_vs_distance.png")
-    plt.savefig(output_path, dpi=300)
-    plt.close()
+    qber_upper = upper_limit(y_max_qber)
+    for x_max in x_max_values:
+        plt.figure(figsize=(7, 5))
+        plt.plot(distances,
+                 qbers,
+                 marker='X',
+                 linestyle='-',
+                 linewidth=1.5,
+                 markersize=6,
+                 color='#d62728')
+        plt.xlabel('Total End-to-End Distance (km)', fontsize=13)
+        plt.ylabel('Quantum Bit Error Rate (QBER)', fontsize=13)
+        plt.title(f'EB-QKD P2P QBER vs. Distance\n(No Relay Nodes, 0–{x_max} km)',
+                  fontsize=16,
+                  fontweight='bold')
+        plt.grid(True)
+        plt.xlim(0, x_max)
+        if x_max <= 200:
+            plt.xticks(np.arange(0, x_max + 1, 10), fontsize=9)
+        elif x_max <= 500:
+            plt.xticks(np.arange(0, x_max + 1, 50), fontsize=9)
+        else:
+            plt.xticks(np.arange(0, x_max + 1, 100), fontsize=9)
+        plt.yticks(fontsize=9)
+        plt.ylim(0, qber_upper)
+        plt.tight_layout()
+        output_path = os.path.join(OUTPUT_DIR, f"p2p_qber_vs_distance_{x_max}km.png")
+        plt.savefig(output_path, dpi=300)
+        plt.close()
 
 
 def run_simulation(num_nodes, channel_length_km, detector_efficiency,
@@ -2102,69 +2121,88 @@ def plot_multi_hop_comparison(results_by_topology,
         'bus': 'D'
     }
 
-    # Per-topology plots
+    x_max_values = list(range(100, 1001, 100))
+
+    # Per-topology plots for each x-axis range
     for topology, res in results_by_topology.items():
+        for x_max in x_max_values:
+            plt.figure(figsize=(8, 6))
+            for h in num_hops_list:
+                if h in res:
+                    d_with = sorted([d for d in distances if d in res[h] and d <= x_max])
+                    rates = [
+                        res[h][d].get("end_to_end_key_rate", 0.0) for d in d_with
+                    ]
+                    plt.plot(d_with,
+                             rates,
+                             marker=topology_markers.get(topology, 'o'),
+                             linestyle='-',
+                             linewidth=2.5,
+                             markersize=10,
+                             color=hop_colors.get(h, 'black'),
+                             label=f'{h} hop{"s" if h != 1 else ""}')
+            plt.xlabel('Total End-to-End Distance (km)', fontsize=11)
+            plt.ylabel('Key Exchange Rate (bits/time unit)', fontsize=11)
+            plt.title(
+                f'{topology.capitalize()} Topology Key Rate vs Total Distance - Multi-Hop',
+                fontsize=16,
+                fontweight='bold')
+            plt.legend(fontsize=10, loc='upper right')
+            plt.grid(True)
+            plt.xlim(0, x_max)
+            plt.ylim(0, 0.45)
+            if x_max <= 200:
+                plt.xticks(np.arange(0, x_max + 1, 10), fontsize=9)
+            elif x_max <= 500:
+                plt.xticks(np.arange(0, x_max + 1, 50), fontsize=9)
+            else:
+                plt.xticks(np.arange(0, x_max + 1, 100), fontsize=9)
+            plt.yticks(np.arange(0, 0.451, 0.05), fontsize=9)
+            plt.tight_layout()
+            out = os.path.join(comp_dir, f"{topology}_multi_hop_comparison_{x_max}km.png")
+            plt.savefig(out, dpi=300)
+            plt.close()
+
+    # Best-of across hops per topology for each x-axis range
+    for x_max in x_max_values:
         plt.figure(figsize=(8, 6))
-        for h in num_hops_list:
-            if h in res:
-                d_with = sorted([d for d in distances if d in res[h]])
-                rates = [
-                    res[h][d].get("end_to_end_key_rate", 0.0) for d in d_with
-                ]
-                plt.plot(d_with,
-                         rates,
-                         marker=topology_markers.get(topology, 'o'),
-                         linestyle='-',
-                         linewidth=2.5,
-                         markersize=10,
-                         color=hop_colors.get(h, 'black'),
-                         label=f'{h} hop{"s" if h != 1 else ""}')
+        for topology, res in results_by_topology.items():
+            best = []
+            d_filtered = sorted([d for d in distances if d <= x_max])
+            for d in d_filtered:
+                best_rate = 0.0
+                for h in num_hops_list:
+                    if h in res and d in res[h]:
+                        r = res[h][d].get("end_to_end_key_rate", 0.0)
+                        best_rate = max(best_rate, r)
+                best.append(best_rate)
+            plt.plot(d_filtered,
+                     best,
+                     marker=topology_markers.get(topology, 'o'),
+                     linestyle='-',
+                     linewidth=2.5,
+                     markersize=10,
+                     label=topology.capitalize())
         plt.xlabel('Total End-to-End Distance (km)', fontsize=11)
-        plt.ylabel('Key Exchange Rate (bits/time unit)', fontsize=11)
-        plt.title(
-            f'Key Exchange Rate vs Distance - {topology.capitalize()} (Multi-hop)',
-            fontsize=16,
-            fontweight='bold')
+        plt.ylabel('Best Key Exchange Rate (bits/time unit)', fontsize=11)
+        plt.title(f'EB-QKD Best Key Exchange Rate vs Distance\n(Optimal Hops, 0–{x_max} km)',
+                  fontsize=16,
+                  fontweight='bold')
         plt.legend(fontsize=10, loc='upper right')
         plt.grid(True)
-        plt.xticks(fontsize=9)
-        plt.yticks(fontsize=9)
+        plt.xlim(0, x_max)
+        plt.ylim(0, 0.45)
+        if x_max <= 200:
+            plt.xticks(np.arange(0, x_max + 1, 10), fontsize=9)
+        elif x_max <= 500:
+            plt.xticks(np.arange(0, x_max + 1, 50), fontsize=9)
+        else:
+            plt.xticks(np.arange(0, x_max + 1, 100), fontsize=9)
+        plt.yticks(np.arange(0, 0.451, 0.05), fontsize=9)
         plt.tight_layout()
-        out = os.path.join(comp_dir, f"{topology}_multi_hop_comparison.png")
+        out = os.path.join(comp_dir, f"topology_comparison_best_rates_{x_max}km.png")
         plt.savefig(out, dpi=300)
         plt.close()
-
-    # Best-of across hops per topology
-    plt.figure(figsize=(8, 6))
-    for topology, res in results_by_topology.items():
-        best = []
-        for d in sorted(distances):
-            best_rate = 0.0
-            for h in num_hops_list:
-                if h in res and d in res[h]:
-                    r = res[h][d].get("end_to_end_key_rate", 0.0)
-                    best_rate = max(best_rate, r)
-            best.append(best_rate)
-        plt.plot(sorted(distances),
-                 best,
-                 marker=topology_markers.get(topology, 'o'),
-                 linestyle='-',
-                 linewidth=2.5,
-                 markersize=10,
-                 label=topology.capitalize())
-    plt.xlabel('Total End-to-End Distance (km)', fontsize=11)
-    plt.ylabel('Best Key Exchange Rate (bits/time unit)', fontsize=11)
-    plt.title('Best Key Exchange Rate vs Distance (Optimal Hops)',
-              fontsize=16,
-              fontweight='bold')
-    plt.legend(fontsize=10, loc='upper right')
-    plt.grid(True)
-    plt.xticks(fontsize=9)
-    plt.yticks(fontsize=9)
-    plt.tight_layout()
-    out = os.path.join(comp_dir, "topology_comparison_best_rates.png")
-    plt.savefig(out, dpi=300)
-    plt.close()
 
 
 # Plot average end-to-end rate vs number of hops per topology
